@@ -23,10 +23,10 @@ export default class App extends React.Component<{}, {
 
 
   private _soundSet = {
-    sound1: () => this._synth.triggerAttackRelease("C2", "16n", undefined, .1),
-    sound2: () => this._synth.triggerAttackRelease("C3", "16n", undefined, .1),
-    sound3: () => this._synth.triggerAttackRelease("C4", "16n", undefined, .1),
-    sound4: () => this._synth.triggerAttackRelease("C5", "16n", undefined, .1)
+    sound1: () => this._synth.triggerAttackRelease("A3", "16n", undefined, .1),
+    sound2: () => this._synth.triggerAttackRelease("B2", "16n", undefined, .1),
+    sound3: () => this._synth.triggerAttackRelease("C2", "16n", undefined, .1),
+    sound4: () => this._synth.triggerAttackRelease("D2", "16n", undefined, .1)
   }
 
   constructor(props: any) {
@@ -113,29 +113,69 @@ export default class App extends React.Component<{}, {
     this.setBeatMultiplier(this.state.beatMultiplier + delta);
   }
 
+  private renderTextSvg(text: string) {
+    return (
+      <svg viewBox='0 0 50 100' style={{ width: '100%', height: 'auto' }} >
+        <text y='50' x='25' textAnchor='middle' alignmentBaseline='middle' fontSize='75'>
+          {text}
+        </text>
+      </svg>
+    );
+  }
+
+  // <svg width="100%" height="100%" viewBox="0 -200 1000 300" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  //   <text font-size="300" fill="black">Text</text>
+  // </svg>
+  //
+
+  private renderNote(index: number) {
+    const noteText: string = index % this.state.beatMultiplier === 0 ? '' + (index / this.state.beatMultiplier + 1) : '.';
+
+    return (
+      <div key={index} style={ {
+        //fontWeight: index === this.state.currentNote ? 'bold' : undefined,
+        fill: index === this.state.currentNote ? 'black' : 'lightgray',
+        height: '100%'
+      } }>
+        { this.renderTextSvg(noteText) }
+      </div>
+    );
+  }
+
   public render() {
     return (
-      <div className="App">
-        <div>
+      <div className="App" style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        left: 0,
+        top: 0
+      }}>
+        <div style={{flex: 0}}>
           <input type='number' value={this.state.tempo} onChange={this.onTempoChange} />
           <button onClick={() => this.setState({ tempo: this.state.tempo + 10 })}>+</button>
           <button onClick={() => this.setState({ tempo: this.state.tempo - 10 })}>-</button>
         </div>
-        <div>
+        <div style={{flex: 0}}>
           <input type='number' value={this.state.beatMultiplier} onChange={e => this.setBeatMultiplier(parseInt(e.target.value, 0))} />
           <button onClick={() => this.increaseBeatMultiplier(1)}>+</button>
           <button onClick={() => this.increaseBeatMultiplier(-1)}>-</button>
         </div>
-        <div>
+        <div style={{flex: 0}}>
           <button onClick={this.start}>Start</button>
           <button onClick={this.stop}>Stop</button>
         </div>
-        <div>
-          {this.state.notes.map((note, index) =>
-            <span style={ index === this.state.currentNote ? { fontWeight: 'bold' } : undefined }>
-              { index % this.state.beatMultiplier === 0 ? (index / this.state.beatMultiplier) + 1 : '.' }&nbsp;
-            </span>
-          )}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          width: '100%',
+          flex: 1,
+          justifyContent: 'center'
+        }}>
+          { this.state.notes.map((note, index) => this.renderNote(index)) }
         </div>
       </div>
     );
